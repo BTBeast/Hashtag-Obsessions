@@ -12,7 +12,7 @@ import matplotlib.cm as cm
 import matplotlib
 
 # Load the JSON data from the URL
-url = 'https://raw.githubusercontent.com/BTBeast/Hashtag-Obsessions/main/Travel_IGPosts_20231010.json'
+url = 'https://raw.githubusercontent.com/BTBeast/Hashtag-Obsessions/main/Processed_Travel_IGPosts_23Oct8367.json'
 data = json.loads(requests.get(url).text)  # Load data using requests and convert it to JSON
 
 # Convert the data into a pandas DataFrame
