@@ -12,7 +12,7 @@ import matplotlib.cm as cm
 import matplotlib
 
 # Load the JSON data from the URL
-url = 'https://raw.githubusercontent.com/BTBeast/Hashtag-Obsessions/main/processed_instagram_posts.json'
+url = 'https://raw.githubusercontent.com/BTBeast/Hashtag-Obsessions/main/Processed_Outdoor_IGposts_23Aug.json'
 data = json.loads(requests.get(url).text)  # Load data using requests and convert it to JSON
 
 # Convert the data into a pandas DataFrame
@@ -22,11 +22,11 @@ df = pd.DataFrame(data)
 df['hashtags'] = df['hashtags'].apply(lambda x: x if isinstance(x, list) else [])
 all_hashtags = [hashtag for sublist in df['hashtags'] for hashtag in sublist if isinstance(sublist, list)]
 
-# Getting the top 100 frequent hashtags
+# Getting the top 1000 frequent hashtags
 top_hashtags = [hashtag for hashtag, count in Counter(all_hashtags).most_common(1000)]
 
-# Randomly sample a number of posts
-sampled_df = df.sample(n=10000, random_state=1)
+# Sample all posts
+sampled_df = df
 
 # Extracting co-occurring top hashtags pairs from the sampled posts
 sampled_df['top_hashtags_pairs'] = sampled_df['hashtags'].apply(
@@ -48,8 +48,9 @@ for pair, frequency in cooccurring_top_hashtags_counts.items():
 # Convert NetworkX graph to igraph
 ig_graph = ig.Graph.from_networkx(G)
 
-# Applying the Leiden algorithm for community detection
-partition = la.find_partition(ig_graph, la.ModularityVertexPartition)
+# Applying the Leiden algorithm for community detection with adjusted resolution
+resolution = 2.0  # Adjust this value to make community detection more or less sensitive
+partition = la.find_partition(ig_graph, la.RBConfigurationVertexPartition, resolution_parameter=resolution)
 
 # Adding community information to the nodes in the graph
 for node, community in zip(G.nodes(), partition.membership):
@@ -62,33 +63,23 @@ nt = Network(notebook=True, height="750px", width="100%")
 top_50_hashtags = sorted(G.nodes(), key=lambda x: G.degree(x), reverse=True)[:50]
 
 # Adding labels to the nodes and setting node size based on degree and color based on community
-cmap = cm.Set2  # Updated to use the attribute instead of the function
+cmap = cm.viridis  # Using 'viridis' colormap
 
-# Calculate the minimum and maximum degree in the graph
-min_degree = min(dict(G.degree()).values())
-max_degree = max(dict(G.degree()).values())
-
-# Function to normalize the degree values
-def normalize_degree(degree, min_degree, max_degree, new_min, new_max):
-    return ((degree - min_degree) / (max_degree - min_degree)) * (new_max - new_min) + new_min
-
-# Adding labels to the nodes and setting node size based on normalized degree and color based on community
 for node in G.nodes():
     if node in top_50_hashtags:
         community = G.nodes[node]['community']
         degree = G.degree(node)
-        normalized_degree = normalize_degree(degree, min_degree, max_degree, 5, 100)  # Normalize degree to the range of 5 to 100
         color = cmap(community / len(set(partition.membership)))  # Normalizing community number to [0,1] for color mapping
         color = list(color[:3])  # Convert RGB to list
-        color.append(0.9)  # Append alpha channel, 0.9 for half transparency
+        color.append(0.7)  # Append alpha channel for transparency
         color = matplotlib.colors.rgb2hex(color, keep_alpha=True)  # Convert RGBA to hex
         nt.add_node(node, 
-                    label=node, 
+                    label="",  # No label here
                     title=f'{node}\nConnections: {degree}', 
-                    size=normalized_degree,  # Updated to use normalized degree
-                    color=color,  # Updated color with transparency
-                    font={"size": normalized_degree, "strokeWidth": 0, "color": "white"},  
-                    shape='circle')  
+                    size=degree * 0.5,  # Adjust the multiplier as needed
+                    color=color,  
+                    font={"size": degree * 0.3, "color": "black"},  # Adjust the multiplier as needed for font size
+                    shape='dot')  # Using 'dot' shape to make the nodes appear larger
 
 # Adding edges
 for edge in G.edges(data=True):
@@ -116,4 +107,4 @@ nt.set_options("""
 """.replace("'", '"'))  
 
 # Save the interactive network graph as an HTML file
-nt.save_graph("network_outdoor.html")
+nt.save_graph("network_outdoor2.html")
