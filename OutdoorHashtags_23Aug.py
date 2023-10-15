@@ -49,7 +49,7 @@ for pair, frequency in cooccurring_top_hashtags_counts.items():
 ig_graph = ig.Graph.from_networkx(G)
 
 # Applying the Leiden algorithm for community detection with adjusted resolution
-resolution = 2.0  # Adjust this value to make community detection more or less sensitive
+resolution = 1.5  # Adjust this value to make community detection more or less sensitive
 partition = la.find_partition(ig_graph, la.RBConfigurationVertexPartition, resolution_parameter=resolution)
 
 # Adding community information to the nodes in the graph
@@ -107,4 +107,4 @@ nt.set_options("""
 """.replace("'", '"'))  
 
 # Save the interactive network graph as an HTML file
-nt.save_graph("network_outdoor2.html")
+nt.save_graph("network_outdoor.html")

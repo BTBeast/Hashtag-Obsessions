@@ -60,7 +60,7 @@ for node, community in zip(G.nodes(), partition.membership):
 nt = Network(notebook=True, height="750px", width="100%")
 
 # Getting the top 50 hashtags by degree for display
-top_50_hashtags = sorted(G.nodes(), key=lambda x: G.degree(x), reverse=True)[:100]
+top_50_hashtags = sorted(G.nodes(), key=lambda x: G.degree(x), reverse=True)[:50]
 
 # Adding labels to the nodes and setting node size based on degree and color based on community
 cmap = cm.viridis  # Using 'viridis' colormap
@@ -91,7 +91,7 @@ nt.set_options("""
 {
   "physics": {
     "forceAtlas2Based": {
-      "gravitationalConstant": -100,
+      "gravitationalConstant": -50,
       "centralGravity": 0.02,
       "springLength": 100,
       "springConstant": 0.03,
