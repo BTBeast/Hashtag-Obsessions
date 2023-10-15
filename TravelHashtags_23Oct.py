@@ -12,7 +12,7 @@ import matplotlib.cm as cm
 import matplotlib
 
 # Load the JSON data from the URL
-url = 'https://raw.githubusercontent.com/BTBeast/Hashtag-Obsessions/main/Travel_IGPosts_20231010.json'
+url = 'https://raw.githubusercontent.com/BTBeast/Hashtag-Obsessions/main/Processed_Travel_IGPosts_23Oct8367.json'
 data = json.loads(requests.get(url).text)  # Load data using requests and convert it to JSON
 
 # Convert the data into a pandas DataFrame
@@ -49,7 +49,7 @@ for pair, frequency in cooccurring_top_hashtags_counts.items():
 ig_graph = ig.Graph.from_networkx(G)
 
 # Applying the Leiden algorithm for community detection with adjusted resolution
-resolution = 2.0  # Adjust this value to make community detection more or less sensitive
+resolution = 1.5  # Adjust this value to make community detection more or less sensitive
 partition = la.find_partition(ig_graph, la.RBConfigurationVertexPartition, resolution_parameter=resolution)
 
 # Adding community information to the nodes in the graph
@@ -60,7 +60,7 @@ for node, community in zip(G.nodes(), partition.membership):
 nt = Network(notebook=True, height="750px", width="100%")
 
 # Getting the top 50 hashtags by degree for display
-top_50_hashtags = sorted(G.nodes(), key=lambda x: G.degree(x), reverse=True)[:50]
+top_50_hashtags = sorted(G.nodes(), key=lambda x: G.degree(x), reverse=True)[:100]
 
 # Adding labels to the nodes and setting node size based on degree and color based on community
 cmap = cm.viridis  # Using 'viridis' colormap
@@ -91,7 +91,7 @@ nt.set_options("""
 {
   "physics": {
     "forceAtlas2Based": {
-      "gravitationalConstant": -50,
+      "gravitationalConstant": -100,
       "centralGravity": 0.02,
       "springLength": 100,
       "springConstant": 0.03,
